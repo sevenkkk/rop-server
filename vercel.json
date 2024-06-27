@@ -4,6 +4,9 @@
   "outputDirectory": "dist",
   "installCommand": "pnpm install",
   "devCommand": "npm run start:prod",
+  "github": {
+    "enabled": true
+  },
   "builds": [
     {
       "src": "dist/main.js",
