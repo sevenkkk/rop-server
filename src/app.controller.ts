@@ -9,7 +9,7 @@ export class AppController {
   @Get()
   health() {
     return {
-      status: 'ok11',
+      status: 'ok',
     };
   }
 }
