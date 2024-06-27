@@ -1,6 +1,9 @@
 {
   "version": 2,
   "buildCommand": "pnpm run vercel-build",
+  "outputDirectory": "dist",
+  "installCommand": "pnpm install",
+  "devCommand": "npm run start:prod",
   "builds": [
     {
       "src": "dist/main.js",
