@@ -7,9 +7,9 @@ export class AppController {
 
   @Public()
   @Get()
-  health() {
+  async health() {
     return {
-      status: 'ok11',
+      status: 'ok',
     };
   }
 }

@@ -13,9 +13,86 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// 工作空间
+model Workspace {
+  id          String      @id
+  description String?
+  users       User[]
+  projects    Project[]
+  accessKey   AccessKey[]
+}
 
+// 用户
 model User {
-  id    Int     @default(autoincrement()) @id
-  username String  @unique
-  password  String?
+  id          Int       @id @default(autoincrement())
+  username    String    @unique
+  password    String
+  role        Role      @default(USER)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String
+}
+
+// 项目
+model Project {
+  id          String    @id
+  name        String
+  framework   Framework
+  description String?
+  envs        Env[]
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String
+  version     Version[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// 访问秘钥
+model AccessKey {
+  accessKey   String    @id
+  name        String?
+  expiration  DateTime?
+  enabled     Boolean   @default(true)
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+}
+
+// 环境
+model Env {
+  id            String    @id
+  alias         String?
+  project       Project   @relation(fields: [projectId], references: [id])
+  projectId     String
+  versions      Version[] @relation("Versions")
+  lastVersion   Version?  @relation(fields: [lastVersionId], references: [id])
+  lastVersionId Int?      @unique
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+// 版本管理
+model Version {
+  id        Int      @id @default(autoincrement())
+  version   String // 版本 格式为 1.1.1
+  path      String // 文件存储路径
+  sigPath   String? // 签名
+  project   Project  @relation(fields: [projectId], references: [id]) // 所属项目
+  projectId String // 项目Id
+  env       Env      @relation("Versions", fields: [envId], references: [id]) // 所属环境
+  envId     String // 环境Id
+  lastBy    Env? // 最后发布环境
+  release   Boolean  @default(false) // 是否已经发布
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 权限
+enum Role {
+  USER
+  ADMIN
+}
+
+// 框架
+enum Framework {
+  TAURI
+  IONIC
 }

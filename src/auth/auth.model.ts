@@ -1,4 +1,4 @@
-import { Prisma, User } from '@prisma/client';
+import { Prisma, Role, User } from '@prisma/client';
 
 export type LoginBody = Pick<Prisma.UserCreateInput, 'username' | 'password'>;
 
@@ -15,4 +15,12 @@ export type AuthResult = {
 export type AuthUser = {
   sub: number;
   username: string;
+  workspace: string;
+  role: Role;
+};
+
+export type RegisterBody = {
+  username: string;
+  password: string;
+  workspaceId: string;
 };

@@ -6,8 +6,9 @@ import {
   AuthUser,
   LoginBody,
   LoginResult,
+  RegisterBody,
 } from '@/src/auth/auth.model';
-import { Prisma, User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { jwtConstants } from '@/src/auth/constants';
 
 @Injectable()
@@ -28,8 +29,19 @@ export class AuthService {
     };
   }
 
-  async register(body: Prisma.UserCreateInput): Promise<LoginResult> {
-    const user = await this.userService.createUser(body);
+  async register(body: RegisterBody): Promise<LoginResult> {
+    const { username, password, workspaceId } = body;
+    const user = await this.userService.createUser({
+      username,
+      password,
+      role: Role.ADMIN,
+      workspace: {
+        connectOrCreate: {
+          where: { id: workspaceId },
+          create: { id: workspaceId },
+        },
+      },
+    });
     return {
       auth: await this.createAuth(user),
       user: { ...user, password: undefined },
@@ -46,7 +58,12 @@ export class AuthService {
   }
 
   async createAuth(user: User): Promise<AuthResult> {
-    const payload: AuthUser = { sub: user.id, username: user.username };
+    const payload: AuthUser = {
+      sub: user.id,
+      username: user.username,
+      workspace: user.workspaceId,
+      role: user.role,
+    };
     return {
       accessToken: await this.jwtService.signAsync(payload, {
         expiresIn: '1h',
