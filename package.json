@@ -23,6 +23,7 @@
     "prisma:dev": "npx prisma migrate dev --name dev",
     "prisma:deploy": "npx prisma migrate deploy",
     "release": "vercel --prod",
+    "f": "prisma format",
     "studio": "prisma studio"
   },
   "dependencies": {
