@@ -11,6 +11,7 @@ export class UserController {
 
   @Get()
   userInfo(@Auth() user: AuthUser): Promise<any> {
+    console.log(user);
     return this.userService.getUser({ id: user.sub });
   }
 }
