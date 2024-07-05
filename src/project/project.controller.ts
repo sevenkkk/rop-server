@@ -20,34 +20,33 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 export class ProjectController {
   constructor(private projectService: ProjectService) {}
 
-  @Get(':id')
-  project(@Param() id: string): Promise<Project> {
-    return this.projectService.getProject({ id });
-  }
-
-  @Get('list')
-  projectList(): Promise<Project[]> {
-    return this.projectService.getProjects({ orderBy: { createdAt: 'desc' } });
-  }
-
-  @Post()
-  createProject(@Body() body: CreateProjectRequest) {
-    return this.projectService.createProject({
-      ...body,
-      workspace: { connect: { id: body.workspaceId } },
-    });
-  }
-
-  @Put()
-  putProject(@Body() body: UpdateProjectRequest) {
-    return this.projectService.updateProject({
-      where: { id: body.id },
-      data: body,
-    });
-  }
-
-  @Delete(':id')
-  deleteProject(@Param() id: string) {
-    return this.projectService.deleteProject({ id });
-  }
+  // @Get(':id')
+  // project(@Param() id: string): Promise<Project> {
+  //   return this.projectService.getProject({ id });
+  // }
+  //
+  // @Get('list')
+  // projectList(): Promise<Project[]> {
+  //   return this.projectService.getProjects({ orderBy: { createdAt: 'desc' } });
+  // }
+  //
+  // @Post()
+  // createProject(@Body() body: CreateProjectRequest) {
+  //   return this.projectService.createProject({
+  //     ...body,
+  //   });
+  // }
+  //
+  // @Put()
+  // putProject(@Body() body: UpdateProjectRequest) {
+  //   return this.projectService.updateProject({
+  //     where: { id: body.id },
+  //     data: body,
+  //   });
+  // }
+  //
+  // @Delete(':id')
+  // deleteProject(@Param() id: string) {
+  //   return this.projectService.deleteProject({ id });
+  // }
 }

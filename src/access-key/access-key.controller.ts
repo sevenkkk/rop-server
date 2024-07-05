@@ -8,28 +8,28 @@ import { Prisma } from '@prisma/client';
 export class AccessKeyController {
   constructor(private accessKeyService: AccessKeyService) {}
 
-  @Get('list')
-  getAccessKeys(@Auth() authUser: AuthUser) {
-    return this.accessKeyService.getAccessKeys({
-      where: { workspaceId: authUser.workspace },
-    });
-  }
-
-  @Post()
-  creatAccessKey(
-    @Body() body: Prisma.AccessKeyCreateInput,
-    @Auth() authUser: AuthUser,
-  ) {
-    return this.accessKeyService.createAccessKey({
-      data: { ...body, workspace: { connect: { id: authUser.workspace } } },
-    });
-  }
-
-  @Delete(':id')
-  deleteAccessKey(@Param() accessKey: string, @Auth() authUser: AuthUser) {
-    return this.accessKeyService.deleteAccessKey({
-      accessKey,
-      workspaceId: authUser.workspace,
-    });
-  }
+  // @Get('list')
+  // getAccessKeys(@Auth() authUser: AuthUser) {
+  //   return this.accessKeyService.getAccessKeys({
+  //     where: { workspaceId: authUser.workspace },
+  //   });
+  // }
+  //
+  // @Post()
+  // creatAccessKey(
+  //   @Body() body: Prisma.AccessKeyCreateInput,
+  //   @Auth() authUser: AuthUser,
+  // ) {
+  //   return this.accessKeyService.createAccessKey({
+  //     data: { ...body, workspace: { connect: { id: authUser.workspace } } },
+  //   });
+  // }
+  //
+  // @Delete(':id')
+  // deleteAccessKey(@Param() accessKey: string, @Auth() authUser: AuthUser) {
+  //   return this.accessKeyService.deleteAccessKey({
+  //     accessKey,
+  //     workspaceId: authUser.workspace,
+  //   });
+  // }
 }

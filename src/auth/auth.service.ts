@@ -8,8 +8,9 @@ import {
   LoginResult,
   RegisterBody,
 } from '@/src/auth/auth.model';
-import { Role, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { jwtConstants } from '@/src/auth/constants';
+import { nanoid } from 'nanoid';
 
 @Injectable()
 export class AuthService {
@@ -30,15 +31,15 @@ export class AuthService {
   }
 
   async register(body: RegisterBody): Promise<LoginResult> {
-    const { username, password, workspaceId } = body;
+    const { username, password } = body;
+    const accountId = `${username}-${nanoid(8)}`;
     const user = await this.userService.createUser({
       username,
       password,
-      role: Role.ADMIN,
-      workspace: {
+      Account: {
         connectOrCreate: {
-          where: { id: workspaceId },
-          create: { id: workspaceId },
+          where: { id: accountId },
+          create: { id: accountId },
         },
       },
     });
@@ -61,8 +62,6 @@ export class AuthService {
     const payload: AuthUser = {
       sub: user.id,
       username: user.username,
-      workspace: user.workspaceId,
-      role: user.role,
     };
     return {
       accessToken: await this.jwtService.signAsync(payload, {

@@ -10,7 +10,6 @@ import { DownloadModule } from './download/download.module';
 import { ProjectModule } from './project/project.module';
 import { VersionModule } from './version/version.module';
 import { EnvModule } from './env/env.module';
-import { WorkspaceModule } from './workspace/workspace.module';
 import { AccessKeyModule } from './access-key/access-key.module';
 
 @Module({
@@ -26,7 +25,6 @@ import { AccessKeyModule } from './access-key/access-key.module';
     ProjectModule,
     VersionModule,
     EnvModule,
-    WorkspaceModule,
     AccessKeyModule,
   ],
   controllers: [AppController],

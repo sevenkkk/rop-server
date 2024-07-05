@@ -15,12 +15,9 @@ export type AuthResult = {
 export type AuthUser = {
   sub: number;
   username: string;
-  workspace: string;
-  role: Role;
 };
 
 export type RegisterBody = {
   username: string;
   password: string;
-  workspaceId: string;
 };

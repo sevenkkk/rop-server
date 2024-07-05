@@ -13,76 +13,120 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 工作空间
-model Workspace {
-  id          String      @id
-  description String?
-  users       User[]
-  projects    Project[]
-  accessKey   AccessKey[]
-}
-
 // 用户
 model User {
-  id          Int       @id @default(autoincrement())
-  username    String    @unique
-  password    String
-  role        Role      @default(USER)
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-  workspaceId String
+  id        Int        @id @default(autoincrement())
+  username  String     @unique
+  password  String
+  Account   Account?
+  UserTeams UserTeam[]
+}
+
+// 团队
+model Team {
+  id          Int        @id @default(autoincrement())
+  description String?
+  Account     Account?
+  UserTeams   UserTeam[]
+}
+
+model UserTeam {
+  userId Int
+  teamId Int
+  role   Role @default(USER)
+  User   User @relation(fields: [userId], references: [id])
+  Team   Team @relation(fields: [teamId], references: [id])
+
+  @@id([userId, teamId])
+}
+
+// 账户
+model Account {
+  id         String      @id
+  userId     Int?        @unique
+  User       User?       @relation(fields: [userId], references: [id])
+  teamId     Int?        @unique
+  Team       Team?       @relation(fields: [teamId], references: [id])
+  AccessKeys AccessKey[]
+  Projects   Project[]
+}
+
+// 访问秘钥
+model AccessKey {
+  id          String    @id
+  accessKey   String
+  description String?
+  expiration  DateTime?
+  enabled     Boolean   @default(true)
+  accountId   String
+  Account     Account   @relation(fields: [accountId], references: [id])
 }
 
 // 项目
 model Project {
   id          String    @id
+  key         String
   name        String
   framework   Framework
   description String?
-  envs        Env[]
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-  workspaceId String
-  version     Version[]
+  accountId   String
+  Account     Account   @relation(fields: [accountId], references: [id])
+  Envs        Env[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-}
+  Versions    Version[]
 
-// 访问秘钥
-model AccessKey {
-  accessKey   String    @id
-  name        String?
-  expiration  DateTime?
-  enabled     Boolean   @default(true)
-  workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  @@unique([key, accountId])
 }
 
 // 环境
 model Env {
+  id        String     @id
+  key       String
+  alias     String?
+  projectId String
+  Project   Project    @relation(fields: [projectId], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  Merchants Merchant[]
+  Versions  Version[]
+
+  @@unique([key, projectId])
+}
+
+// 商户
+model Merchant {
   id            String    @id
+  key           String
   alias         String?
-  project       Project   @relation(fields: [projectId], references: [id])
-  projectId     String
-  versions      Version[] @relation("Versions")
-  lastVersion   Version?  @relation(fields: [lastVersionId], references: [id])
-  lastVersionId Int?      @unique
+  envId         String
+  Env           Env       @relation(fields: [envId], references: [id])
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  Versions      Version[] @relation("Versions")
+  lastVersionId Int?      @unique
+  LastVersion   Version?  @relation(fields: [lastVersionId], references: [id])
+
+  @@unique([key, envId])
 }
 
 // 版本管理
 model Version {
-  id        Int      @id @default(autoincrement())
-  version   String // 版本 格式为 1.1.1
-  path      String // 文件存储路径
-  sigPath   String? // 签名
-  project   Project  @relation(fields: [projectId], references: [id]) // 所属项目
-  projectId String // 项目Id
-  env       Env      @relation("Versions", fields: [envId], references: [id]) // 所属环境
-  envId     String // 环境Id
-  lastBy    Env? // 最后发布环境
-  release   Boolean  @default(false) // 是否已经发布
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         Int       @id @default(autoincrement())
+  version    String // 版本 格式为 1.1.1
+  path       String // 文件存储路径
+  sigPath    String? // 签名
+  platform   Platform // 平台
+  projectId  String // 项目Id
+  Project    Project   @relation(fields: [projectId], references: [id])
+  envId      String
+  Env        Env       @relation(fields: [envId], references: [id])
+  merchantId String // 商户Id
+  Merchant   Merchant  @relation("Versions", fields: [merchantId], references: [id])
+  LastBy     Merchant? // 最后发布商户
+  release    Boolean   @default(false) // 是否已经发布
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 // 权限
@@ -95,4 +139,13 @@ enum Role {
 enum Framework {
   TAURI
   IONIC
+}
+
+// 平台
+enum Platform {
+  Android
+  IOS
+  Windows
+  MacOS
+  H5
 }
