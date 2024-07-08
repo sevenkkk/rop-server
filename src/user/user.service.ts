@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/src/prisma/prisma.service';
-import { User, Prisma, Account } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
+import { getSkip, PaginationResult } from '@/src/share/model';
+import { UserListBody } from '@/src/user/user.model';
 
 @Injectable()
 export class UserService {
@@ -11,27 +13,32 @@ export class UserService {
   ): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: whereUniqueInput,
+      include: {
+        Account: true,
+        UserTeams: true,
+      },
     });
   }
 
-  async getUsers(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.UserWhereUniqueInput;
-    where?: Prisma.UserWhereInput;
-    orderBy?: Prisma.UserOrderByWithRelationInput;
-  }): Promise<(User & { Account: Account })[]> {
-    const { skip, take, cursor, where, orderBy } = params;
-    return this.prisma.user.findMany({
+  async getUserList(body: UserListBody) {
+    const { username } = body;
+    const { page, pageSize: take, skip } = getSkip(body);
+    const where: Prisma.UserWhereInput = username
+      ? {
+          username: {
+            contains: username,
+          },
+        }
+      : undefined;
+    const userList = await this.prisma.user.findMany({
       skip,
       take,
-      cursor,
       where,
-      orderBy,
-      include: {
-        Account: true,
-      },
     });
+    const count = await this.prisma.user.count({
+      where,
+    });
+    return new PaginationResult(userList, count, page);
   }
 
   async createUser(data: Prisma.UserCreateInput): Promise<User> {

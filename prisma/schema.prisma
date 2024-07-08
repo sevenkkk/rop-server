@@ -25,6 +25,7 @@ model User {
 // 团队
 model Team {
   id          Int        @id @default(autoincrement())
+  key         String     @unique
   description String?
   Account     Account?
   UserTeams   UserTeam[]
@@ -54,7 +55,7 @@ model Account {
 // 访问秘钥
 model AccessKey {
   id          String    @id
-  accessKey   String
+  accessKey   String    @unique
   description String?
   expiration  DateTime?
   enabled     Boolean   @default(true)
@@ -71,7 +72,6 @@ model Project {
   description String?
   accountId   String
   Account     Account   @relation(fields: [accountId], references: [id])
-  Envs        Env[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   Versions    Version[]
@@ -79,55 +79,25 @@ model Project {
   @@unique([key, accountId])
 }
 
-// 环境
-model Env {
-  id        String     @id
-  key       String
-  alias     String?
-  projectId String
-  Project   Project    @relation(fields: [projectId], references: [id])
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  Merchants Merchant[]
-  Versions  Version[]
-
-  @@unique([key, projectId])
-}
-
-// 商户
-model Merchant {
-  id            String    @id
-  key           String
-  alias         String?
-  envId         String
-  Env           Env       @relation(fields: [envId], references: [id])
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  Versions      Version[] @relation("Versions")
-  lastVersionId Int?      @unique
-  LastVersion   Version?  @relation(fields: [lastVersionId], references: [id])
-
-  @@unique([key, envId])
-}
-
 // 版本管理
 model Version {
-  id         Int       @id @default(autoincrement())
-  version    String // 版本 格式为 1.1.1
-  path       String // 文件存储路径
-  sigPath    String? // 签名
-  platform   Platform // 平台
-  projectId  String // 项目Id
-  Project    Project   @relation(fields: [projectId], references: [id])
-  envId      String
-  Env        Env       @relation(fields: [envId], references: [id])
-  merchantId String // 商户Id
-  Merchant   Merchant  @relation("Versions", fields: [merchantId], references: [id])
-  LastBy     Merchant? // 最后发布商户
-  release    Boolean   @default(false) // 是否已经发布
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id        Int      @id @default(autoincrement())
+  version   String // 版本 格式为 1.1.1
+  path      String // 文件存储路径
+  sigPath   String? // 签名
+  platform  Platform // 平台
+  projectId String // 项目Id
+  branch    String // 分支
+  Project   Project  @relation(fields: [projectId], references: [id])
+  release   Boolean  @default(false) // 是否已经发布
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, branch, version])
 }
+
+// path: /key-projectId/branch/version/xxxx.apk
+// params: accessKey, projectKey, branch, version, file
 
 // 权限
 enum Role {

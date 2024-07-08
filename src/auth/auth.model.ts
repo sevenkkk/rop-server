@@ -1,6 +1,27 @@
-import { Prisma, Role, User } from '@prisma/client';
+import { User } from '@prisma/client';
+import { IsNotEmpty } from 'class-validator';
 
-export type LoginBody = Pick<Prisma.UserCreateInput, 'username' | 'password'>;
+export class LoginBody {
+  @IsNotEmpty({
+    message: '请输入用户名',
+  })
+  username: string;
+  @IsNotEmpty({
+    message: '请输入密码',
+  })
+  password: string;
+}
+
+export class RegisterBody {
+  @IsNotEmpty({
+    message: '请输入用户名',
+  })
+  username: string;
+  @IsNotEmpty({
+    message: '请输入密码',
+  })
+  password: string;
+}
 
 export type LoginResult = {
   auth: AuthResult;
@@ -15,9 +36,4 @@ export type AuthResult = {
 export type AuthUser = {
   sub: number;
   username: string;
-};
-
-export type RegisterBody = {
-  username: string;
-  password: string;
 };

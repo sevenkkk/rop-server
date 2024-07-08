@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '@/src/user/user.service';
 import {
@@ -32,8 +37,12 @@ export class AuthService {
 
   async register(body: RegisterBody): Promise<LoginResult> {
     const { username, password } = body;
+    const user = await this.userService.getUser({ username });
+    if (user) {
+      throw new HttpException('用户名已存在', HttpStatus.BAD_REQUEST);
+    }
     const accountId = `${username}-${nanoid(8)}`;
-    const user = await this.userService.createUser({
+    const newUser = await this.userService.createUser({
       username,
       password,
       Account: {
@@ -44,8 +53,8 @@ export class AuthService {
       },
     });
     return {
-      auth: await this.createAuth(user),
-      user: { ...user, password: undefined },
+      auth: await this.createAuth(newUser),
+      user: { ...newUser, password: undefined },
     };
   }
 

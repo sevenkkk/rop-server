@@ -2,12 +2,11 @@ import { Controller, Get, Param, Res } from '@nestjs/common';
 import { Public } from '@/src/auth/constants';
 import { Response } from 'express';
 import fs from 'node:fs';
-import { EnvService } from '@/src/env/env.service';
 import { DownloadParamType } from '@/src/download/download.model';
 
 @Controller('download')
 export class DownloadController {
-  constructor(private envService: EnvService) {}
+  constructor() {}
 
   // @Public()
   // @Get('/:workspace/:project/:.env/:version/:fileName')

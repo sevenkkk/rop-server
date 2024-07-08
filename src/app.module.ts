@@ -9,8 +9,8 @@ import { UploadModule } from './upload/upload.module';
 import { DownloadModule } from './download/download.module';
 import { ProjectModule } from './project/project.module';
 import { VersionModule } from './version/version.module';
-import { EnvModule } from './env/env.module';
 import { AccessKeyModule } from './access-key/access-key.module';
+import { TeamModule } from './team/team.module';
 
 @Module({
   imports: [
@@ -24,8 +24,8 @@ import { AccessKeyModule } from './access-key/access-key.module';
     DownloadModule,
     ProjectModule,
     VersionModule,
-    EnvModule,
     AccessKeyModule,
+    TeamModule,
   ],
   controllers: [AppController],
   providers: [AppService],
