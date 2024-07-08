@@ -75,6 +75,7 @@ model Project {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   Versions    Version[]
+  Branch      Branch[]
 
   @@unique([key, accountId])
 }
@@ -82,6 +83,8 @@ model Project {
 model Branch {
   id               Int       @id @default(autoincrement())
   branchName       String
+  projectId        String
+  Project          Project   @relation(fields: [projectId], references: [id])
   Versions         Version[]
   releaseVersionId Int?      @unique
   RealseVersion    Version?  @relation("release", fields: [releaseVersionId], references: [id])
