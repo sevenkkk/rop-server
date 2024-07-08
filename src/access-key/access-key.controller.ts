@@ -3,7 +3,10 @@ import { AccessKeyService } from '@/src/access-key/access-key.service';
 import { Auth } from '@/src/auth/auth.decorator';
 import { AuthUser } from '@/src/auth/auth.model';
 import { Prisma } from '@prisma/client';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { CreateAccessKeyBody } from '@/src/access-key/access-key.model';
 
+@ApiBearerAuth()
 @Controller('access-key')
 export class AccessKeyController {
   constructor(private accessKeyService: AccessKeyService) {}
@@ -15,15 +18,11 @@ export class AccessKeyController {
   //   });
   // }
   //
-  // @Post()
-  // creatAccessKey(
-  //   @Body() body: Prisma.AccessKeyCreateInput,
-  //   @Auth() authUser: AuthUser,
-  // ) {
-  //   return this.accessKeyService.createAccessKey({
-  //     data: { ...body, workspace: { connect: { id: authUser.workspace } } },
-  //   });
-  // }
+  @Post()
+  creatAccessKey(@Body() body: CreateAccessKeyBody) {
+    console.log(typeof body.expiration); // true
+    return this.accessKeyService.createAccessKey(body);
+  }
   //
   // @Delete(':id')
   // deleteAccessKey(@Param() accessKey: string, @Auth() authUser: AuthUser) {

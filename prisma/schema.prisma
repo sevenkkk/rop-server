@@ -54,7 +54,7 @@ model Account {
 
 // 访问秘钥
 model AccessKey {
-  id          String    @id
+  id          Int       @id @default(autoincrement())
   accessKey   String    @unique
   description String?
   expiration  DateTime?
@@ -79,21 +79,31 @@ model Project {
   @@unique([key, accountId])
 }
 
+model Branch {
+  id               Int       @id @default(autoincrement())
+  branchName       String
+  Versions         Version[]
+  releaseVersionId Int?      @unique
+  RealseVersion    Version?  @relation("release", fields: [releaseVersionId], references: [id])
+}
+
 // 版本管理
 model Version {
-  id        Int      @id @default(autoincrement())
-  version   String // 版本 格式为 1.1.1
-  path      String // 文件存储路径
-  sigPath   String? // 签名
-  platform  Platform // 平台
-  projectId String // 项目Id
-  branch    String // 分支
-  Project   Project  @relation(fields: [projectId], references: [id])
-  release   Boolean  @default(false) // 是否已经发布
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  version       String // 版本 格式为 1.1.1
+  path          String // 文件存储路径
+  sigPath       String? // 签名
+  platform      Platform // 平台
+  projectId     String // 项目Id
+  Project       Project  @relation(fields: [projectId], references: [id])
+  release       Boolean  @default(false) // 是否已经发布
+  branchId      Int
+  Branch        Branch   @relation(fields: [branchId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  ReleaseBranch Branch?  @relation("release")
 
-  @@unique([projectId, branch, version])
+  @@unique([projectId, branchId, version])
 }
 
 // path: /key-projectId/branch/version/xxxx.apk
