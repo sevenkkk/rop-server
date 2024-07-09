@@ -1,18 +1,11 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common';
 import { AccessKeyService } from '@/src/access-key/access-key.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import {
   AccessKeyListDTO,
   CreateAccessKeyDTO,
   EnableAccessKeyDTO,
+  UpdateAccessKeyDTO,
 } from '@/src/access-key/access-key.model';
 import { Auth } from '@/src/auth/auth.decorator';
 import { AuthUser } from '@/src/auth/auth.model';
@@ -43,5 +36,10 @@ export class AccessKeyController {
   @Put('enabled')
   enableAccessKey(@Auth() user: AuthUser, @Body() body: EnableAccessKeyDTO) {
     return this.accessKeyService.enableAccessKey(user, body);
+  }
+
+  @Put()
+  updateAccessKey(@Auth() user: AuthUser, @Body() body: UpdateAccessKeyDTO) {
+    return this.accessKeyService.updateAccessKey(user, body);
   }
 }

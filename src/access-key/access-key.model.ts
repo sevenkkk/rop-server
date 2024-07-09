@@ -8,14 +8,25 @@ export class CreateAccessKeyDTO {
 }
 
 export class AccessKeyListDTO extends PaginationDTO {
-  @IsNotEmpty({ message: '请输入账户ID' })
-  accountId: string;
   accessKey: string;
 }
 
 export class EnableAccessKeyDTO {
-  @IsNotEmpty({ message: '请输入密钥' })
-  accessKey: string;
+  @IsNumber(
+    { allowNaN: false, allowInfinity: false, maxDecimalPlaces: 0 },
+    { message: '请输入正确的id' },
+  )
+  id: number;
   @IsBoolean({ message: '请输入正确的状态' })
   status: boolean;
+}
+
+export class UpdateAccessKeyDTO {
+  @IsNumber(
+    { allowNaN: false, allowInfinity: false, maxDecimalPlaces: 0 },
+    { message: '请输入正确的id' },
+  )
+  id: number;
+  description: string;
+  expiration: string;
 }

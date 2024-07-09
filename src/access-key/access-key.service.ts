@@ -5,24 +5,22 @@ import {
   AccessKeyListDTO,
   CreateAccessKeyDTO,
   EnableAccessKeyDTO,
+  UpdateAccessKeyDTO,
 } from '@/src/access-key/access-key.model';
 import { nanoid } from 'nanoid';
 import { getSkip, PaginationVO } from '@/src/share/model';
 import { AuthUser } from '@/src/auth/auth.model';
+import { ShareService } from '@/src/share/share.service';
 
 @Injectable()
 export class AccessKeyService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private shareService: ShareService,
+  ) {}
 
   async getAccessKeyList(authUser: AuthUser, body: AccessKeyListDTO) {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id: authUser.sub,
-      },
-      include: {
-        account: true,
-      },
-    });
+    const user = await this.shareService.getAuthUser(authUser);
     const accountId = user.account.id;
     const { accessKey } = body;
     const { page, pageSize: take, skip } = getSkip(body);
@@ -42,14 +40,7 @@ export class AccessKeyService {
     authUser: AuthUser,
     body: CreateAccessKeyDTO,
   ): Promise<AccessKey> {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id: authUser.sub,
-      },
-      include: {
-        account: true,
-      },
-    });
+    const user = await this.shareService.getAuthUser(authUser);
     const accountId = user.account.id;
     const { description, expiration } = body;
     const accessKey = nanoid(32);
@@ -68,14 +59,7 @@ export class AccessKeyService {
     authUser: AuthUser,
     accessKey: string,
   ): Promise<AccessKey> {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id: authUser.sub,
-      },
-      include: {
-        account: true,
-      },
-    });
+    const user = await this.shareService.getAuthUser(authUser);
     const accountId = user.account.id;
     return this.prisma.accessKey.delete({
       where: {
@@ -88,25 +72,32 @@ export class AccessKeyService {
   }
 
   async enableAccessKey(authUser: AuthUser, body: EnableAccessKeyDTO) {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id: authUser.sub,
-      },
-      include: {
-        account: true,
-      },
-    });
+    const user = await this.shareService.getAuthUser(authUser);
     const accountId = user.account.id;
-    const { accessKey, status } = body;
+    const { id, status } = body;
     return this.prisma.accessKey.update({
       data: {
         enabled: status,
       },
       where: {
-        accountId_accessKey: {
-          accountId,
-          accessKey,
-        },
+        id,
+        accountId,
+      },
+    });
+  }
+
+  async updateAccessKey(authUser: AuthUser, body: UpdateAccessKeyDTO) {
+    const user = await this.shareService.getAuthUser(authUser);
+    const accountId = user.account.id;
+    const { id, expiration, description } = body;
+    return this.prisma.accessKey.update({
+      data: {
+        expiration: expiration ? new Date(expiration) : undefined,
+        description,
+      },
+      where: {
+        id,
+        accountId,
       },
     });
   }
