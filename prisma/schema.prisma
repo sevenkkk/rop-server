@@ -61,6 +61,8 @@ model AccessKey {
   enabled     Boolean   @default(true)
   accountId   String
   Account     Account   @relation(fields: [accountId], references: [id])
+
+  @@unique([accountId, accessKey])
 }
 
 // 项目

@@ -1,34 +1,34 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common';
 import { AccessKeyService } from '@/src/access-key/access-key.service';
-import { Auth } from '@/src/auth/auth.decorator';
-import { AuthUser } from '@/src/auth/auth.model';
-import { Prisma } from '@prisma/client';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { CreateAccessKeyBody } from '@/src/access-key/access-key.model';
+import {
+  AccessKeyListBody,
+  CreateAccessKeyBody,
+  EnableAccessKeyBody,
+} from '@/src/access-key/access-key.model';
 
 @ApiBearerAuth()
 @Controller('access-key')
 export class AccessKeyController {
   constructor(private accessKeyService: AccessKeyService) {}
 
-  // @Get('list')
-  // getAccessKeys(@Auth() authUser: AuthUser) {
-  //   return this.accessKeyService.getAccessKeys({
-  //     where: { workspaceId: authUser.workspace },
-  //   });
-  // }
-  //
+  @Post('list')
+  getAccessKeys(@Body() body: AccessKeyListBody) {
+    return this.accessKeyService.getAccessKeyList(body);
+  }
+
   @Post()
   creatAccessKey(@Body() body: CreateAccessKeyBody) {
-    console.log(typeof body.expiration); // true
     return this.accessKeyService.createAccessKey(body);
   }
-  //
-  // @Delete(':id')
-  // deleteAccessKey(@Param() accessKey: string, @Auth() authUser: AuthUser) {
-  //   return this.accessKeyService.deleteAccessKey({
-  //     accessKey,
-  //     workspaceId: authUser.workspace,
-  //   });
-  // }
+
+  @Delete(':id')
+  deleteAccessKey(@Param() params: { id: string }) {
+    return this.accessKeyService.deleteAccessKey(parseInt(params.id));
+  }
+
+  @Put('enabled')
+  enableAccessKey(@Body() body: EnableAccessKeyBody) {
+    return this.accessKeyService.enableAccessKey(body);
+  }
 }

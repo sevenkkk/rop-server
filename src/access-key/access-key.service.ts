@@ -1,22 +1,35 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '@/src/prisma/prisma.service';
 import { Prisma, AccessKey } from '@prisma/client';
-import { CreateAccessKeyBody } from '@/src/access-key/access-key.model';
+import {
+  AccessKeyListBody,
+  CreateAccessKeyBody,
+  EnableAccessKeyBody,
+} from '@/src/access-key/access-key.model';
 import { nanoid } from 'nanoid';
+import { getSkip, PaginationResult } from '@/src/share/model';
 
 @Injectable()
 export class AccessKeyService {
   constructor(private prisma: PrismaService) {}
 
-  getAccessKeys(params: {
-    where?: Prisma.AccessKeyWhereInput;
-    orderBy?: Prisma.AccessKeyOrderByWithRelationInput;
-  }): Promise<AccessKey[]> {
-    const { orderBy, where } = params;
-    return this.prisma.accessKey.findMany({
-      orderBy,
+  async getAccessKeyList(body: AccessKeyListBody) {
+    const { accountId, accessKey } = body;
+    const account = await this.prisma.account.findUnique({
+      where: { id: accountId },
+    });
+    if (!account) {
+      throw new HttpException('账户不存在', HttpStatus.BAD_REQUEST);
+    }
+    const { page, pageSize: take, skip } = getSkip(body);
+    const where = { accountId, accessKey: accessKey ? accessKey : undefined };
+    const list = await this.prisma.accessKey.findMany({
+      skip,
+      take,
       where,
     });
+    const count = await this.prisma.accessKey.count({});
+    return new PaginationResult(list, count, page);
   }
 
   async createAccessKey(body: CreateAccessKeyBody): Promise<AccessKey> {
@@ -39,9 +52,23 @@ export class AccessKeyService {
     });
   }
 
-  deleteAccessKey(where: Prisma.AccessKeyWhereUniqueInput): Promise<AccessKey> {
+  deleteAccessKey(id: number): Promise<AccessKey> {
     return this.prisma.accessKey.delete({
-      where,
+      where: {
+        id,
+      },
+    });
+  }
+
+  enableAccessKey(body: EnableAccessKeyBody) {
+    const { id, status } = body;
+    return this.prisma.accessKey.update({
+      data: {
+        enabled: status,
+      },
+      where: {
+        id,
+      },
     });
   }
 }
