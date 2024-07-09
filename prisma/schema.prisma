@@ -82,12 +82,15 @@ model Project {
 
 model Branch {
   id               Int       @id @default(autoincrement())
+  key              String
   branchName       String
   projectId        String
   Project          Project   @relation(fields: [projectId], references: [id])
   Versions         Version[]
   releaseVersionId Int?      @unique
   RealseVersion    Version?  @relation("release", fields: [releaseVersionId], references: [id])
+
+  @@unique([key, projectId])
 }
 
 // 版本管理
