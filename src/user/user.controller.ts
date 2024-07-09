@@ -3,7 +3,7 @@ import { UserService } from '@/src/user/user.service';
 import { AuthUser } from '@/src/auth/auth.model';
 import { Auth } from '@/src/auth/auth.decorator';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { UserListBody } from '@/src/user/user.model';
+import { UserListDTO } from '@/src/user/user.model';
 
 @ApiBearerAuth()
 @Controller('user')
@@ -16,7 +16,7 @@ export class UserController {
   }
 
   @Post('list')
-  userList(@Body() body: UserListBody) {
+  userList(@Body() body: UserListDTO) {
     return this.userService.getUserList(body);
   }
 }

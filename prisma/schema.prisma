@@ -18,25 +18,26 @@ model User {
   id        Int        @id @default(autoincrement())
   username  String     @unique
   password  String
-  Account   Account?
-  UserTeams UserTeam[]
+  account   Account?
+  userTeams UserTeam[]
 }
 
 // 团队
 model Team {
   id          Int        @id @default(autoincrement())
-  key         String     @unique
+  key         String
+  name        String?
   description String?
-  Account     Account?
-  UserTeams   UserTeam[]
+  account     Account?
+  userTeams   UserTeam[]
 }
 
 model UserTeam {
   userId Int
   teamId Int
   role   Role @default(USER)
-  User   User @relation(fields: [userId], references: [id])
-  Team   Team @relation(fields: [teamId], references: [id])
+  user   User @relation(fields: [userId], references: [id])
+  team   Team @relation(fields: [teamId], references: [id])
 
   @@id([userId, teamId])
 }
@@ -45,11 +46,11 @@ model UserTeam {
 model Account {
   id         String      @id
   userId     Int?        @unique
-  User       User?       @relation(fields: [userId], references: [id])
+  user       User?       @relation(fields: [userId], references: [id])
   teamId     Int?        @unique
-  Team       Team?       @relation(fields: [teamId], references: [id])
-  AccessKeys AccessKey[]
-  Projects   Project[]
+  team       Team?       @relation(fields: [teamId], references: [id])
+  accessKeys AccessKey[]
+  projects   Project[]
 }
 
 // 访问秘钥
@@ -60,7 +61,7 @@ model AccessKey {
   expiration  DateTime?
   enabled     Boolean   @default(true)
   accountId   String
-  Account     Account   @relation(fields: [accountId], references: [id])
+  account     Account   @relation(fields: [accountId], references: [id])
 
   @@unique([accountId, accessKey])
 }
@@ -68,31 +69,29 @@ model AccessKey {
 // 项目
 model Project {
   id          String    @id
-  key         String
-  name        String
+  name        String    // 英文
   framework   Framework
   description String?
   accountId   String
-  Account     Account   @relation(fields: [accountId], references: [id])
+  account     Account   @relation(fields: [accountId], references: [id])
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  Versions    Version[]
-  Branch      Branch[]
+  versions    Version[]
+  branch      Branch[]
 
-  @@unique([key, accountId])
+  @@unique([name, accountId])
 }
 
 model Branch {
   id               Int       @id @default(autoincrement())
-  key              String
-  branchName       String
+  branch           String
   projectId        String
-  Project          Project   @relation(fields: [projectId], references: [id])
-  Versions         Version[]
+  project          Project   @relation(fields: [projectId], references: [id])
+  versions         Version[]
   releaseVersionId Int?      @unique
-  RealseVersion    Version?  @relation("release", fields: [releaseVersionId], references: [id])
+  realseVersion    Version?  @relation("release", fields: [releaseVersionId], references: [id])
 
-  @@unique([key, projectId])
+  @@unique([branch, projectId])
 }
 
 // 版本管理
@@ -106,15 +105,24 @@ model Version {
   Project       Project  @relation(fields: [projectId], references: [id])
   release       Boolean  @default(false) // 是否已经发布
   branchId      Int
-  Branch        Branch   @relation(fields: [branchId], references: [id])
+  branch        Branch   @relation(fields: [branchId], references: [id])
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  ReleaseBranch Branch?  @relation("release")
+  releaseBranch Branch?  @relation("release")
 
   @@unique([projectId, branchId, version])
 }
 
-// path: /key-projectId/branch/version/xxxx.apk
+// accountId => seven-000000000
+// kumao-111111111
+// accountId/plan/branch/version/xxxx.apk
+// plan-00000000/master/0.0.1/plan.apk
+
+// path: /213123123123213123213121234123123123/branch/version/xxxx.apk
+// 客户  url
+
+//
+
 // params: accessKey, projectKey, branch, version, file
 
 // 权限
@@ -127,6 +135,7 @@ enum Role {
 enum Framework {
   TAURI
   IONIC
+  FLUTTER
 }
 
 // 平台

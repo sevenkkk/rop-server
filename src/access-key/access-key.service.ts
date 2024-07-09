@@ -1,26 +1,30 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/src/prisma/prisma.service';
-import { Prisma, AccessKey } from '@prisma/client';
+import { AccessKey } from '@prisma/client';
 import {
-  AccessKeyListBody,
-  CreateAccessKeyBody,
-  EnableAccessKeyBody,
+  AccessKeyListDTO,
+  CreateAccessKeyDTO,
+  EnableAccessKeyDTO,
 } from '@/src/access-key/access-key.model';
 import { nanoid } from 'nanoid';
-import { getSkip, PaginationResult } from '@/src/share/model';
+import { getSkip, PaginationVO } from '@/src/share/model';
+import { AuthUser } from '@/src/auth/auth.model';
 
 @Injectable()
 export class AccessKeyService {
   constructor(private prisma: PrismaService) {}
 
-  async getAccessKeyList(body: AccessKeyListBody) {
-    const { accountId, accessKey } = body;
-    const account = await this.prisma.account.findUnique({
-      where: { id: accountId },
+  async getAccessKeyList(authUser: AuthUser, body: AccessKeyListDTO) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: authUser.sub,
+      },
+      include: {
+        account: true,
+      },
     });
-    if (!account) {
-      throw new HttpException('账户不存在', HttpStatus.BAD_REQUEST);
-    }
+    const accountId = user.account.id;
+    const { accessKey } = body;
     const { page, pageSize: take, skip } = getSkip(body);
     const where = { accountId, accessKey: accessKey ? accessKey : undefined };
     const list = await this.prisma.accessKey.findMany({
@@ -28,18 +32,26 @@ export class AccessKeyService {
       take,
       where,
     });
-    const count = await this.prisma.accessKey.count({});
-    return new PaginationResult(list, count, page);
+    const count = await this.prisma.accessKey.count({
+      where,
+    });
+    return new PaginationVO(list, count, page);
   }
 
-  async createAccessKey(body: CreateAccessKeyBody): Promise<AccessKey> {
-    const { accountId, description, expiration } = body;
-    const account = await this.prisma.account.findUnique({
-      where: { id: accountId },
+  async createAccessKey(
+    authUser: AuthUser,
+    body: CreateAccessKeyDTO,
+  ): Promise<AccessKey> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: authUser.sub,
+      },
+      include: {
+        account: true,
+      },
     });
-    if (!account) {
-      throw new HttpException('账户不存在', HttpStatus.BAD_REQUEST);
-    }
+    const accountId = user.account.id;
+    const { description, expiration } = body;
     const accessKey = nanoid(32);
     return this.prisma.accessKey.create({
       data: {
@@ -52,22 +64,49 @@ export class AccessKeyService {
     });
   }
 
-  deleteAccessKey(id: number): Promise<AccessKey> {
+  async deleteAccessKey(
+    authUser: AuthUser,
+    accessKey: string,
+  ): Promise<AccessKey> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: authUser.sub,
+      },
+      include: {
+        account: true,
+      },
+    });
+    const accountId = user.account.id;
     return this.prisma.accessKey.delete({
       where: {
-        id,
+        accountId_accessKey: {
+          accountId,
+          accessKey,
+        },
       },
     });
   }
 
-  enableAccessKey(body: EnableAccessKeyBody) {
-    const { id, status } = body;
+  async enableAccessKey(authUser: AuthUser, body: EnableAccessKeyDTO) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: authUser.sub,
+      },
+      include: {
+        account: true,
+      },
+    });
+    const accountId = user.account.id;
+    const { accessKey, status } = body;
     return this.prisma.accessKey.update({
       data: {
         enabled: status,
       },
       where: {
-        id,
+        accountId_accessKey: {
+          accountId,
+          accessKey,
+        },
       },
     });
   }

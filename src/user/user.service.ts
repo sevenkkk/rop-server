@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/src/prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
-import { getSkip, PaginationResult } from '@/src/share/model';
-import { UserListBody } from '@/src/user/user.model';
+import { getSkip, PaginationVO } from '@/src/share/model';
+import { UserListDTO } from '@/src/user/user.model';
 
 @Injectable()
 export class UserService {
@@ -14,13 +14,13 @@ export class UserService {
     return this.prisma.user.findUnique({
       where: whereUniqueInput,
       include: {
-        Account: true,
-        UserTeams: true,
+        account: true,
+        userTeams: true,
       },
     });
   }
 
-  async getUserList(body: UserListBody) {
+  async getUserList(body: UserListDTO) {
     const { username } = body;
     const { page, pageSize: take, skip } = getSkip(body);
     const where: Prisma.UserWhereInput = username
@@ -38,7 +38,7 @@ export class UserService {
     const count = await this.prisma.user.count({
       where,
     });
-    return new PaginationResult(userList, count, page);
+    return new PaginationVO(userList, count, page);
   }
 
   async createUser(data: Prisma.UserCreateInput): Promise<User> {

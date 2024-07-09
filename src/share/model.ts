@@ -1,9 +1,9 @@
-export class Pagination {
+export class PaginationDTO {
   page: number;
   pageSize: number;
 }
 
-export class PaginationResult<T> {
+export class PaginationVO<T> {
   list: T[];
   total: number;
   page: number;
@@ -15,7 +15,7 @@ export class PaginationResult<T> {
   }
 }
 
-export function getSkip(pagination: Pagination) {
+export function getSkip(pagination: PaginationDTO) {
   let { page, pageSize } = pagination;
   if (!page || page <= 0) {
     page = 1;

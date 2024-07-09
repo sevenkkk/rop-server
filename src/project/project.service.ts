@@ -1,48 +1,107 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '@/src/prisma/prisma.service';
-import { Prisma, Project } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import { nanoid } from 'nanoid';
+import {
+  CreateProjectDTO,
+  ProjectListDTO,
+  UpdateProjectDTO,
+} from '@/src/project/project.model';
+import { getSkip, PaginationVO } from '@/src/share/model';
+import { AuthUser } from '@/src/auth/auth.model';
+import { ShareService } from '@/src/share/share.service';
 
 @Injectable()
 export class ProjectService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private shareService: ShareService,
+  ) {}
 
-  async getProject(
-    whereUniqueInput: Prisma.ProjectWhereUniqueInput,
-  ): Promise<Project | null> {
-    return this.prisma.project.findUnique({
-      where: whereUniqueInput,
+  async getProjectList(authUser: AuthUser, body: ProjectListDTO) {
+    const user = await this.shareService.getAuthUser(authUser);
+    const accountId = user.account.id;
+    const { name } = body;
+    const { page, pageSize: take, skip } = getSkip(body);
+    const where = {
+      accountId,
+      name: name
+        ? {
+            contains: name,
+          }
+        : undefined,
+    };
+    const list = await this.prisma.project.findMany({
+      skip,
+      take,
+      where,
+      orderBy: {
+        createdAt: Prisma.SortOrder.desc,
+      },
     });
+    const count = await this.prisma.project.count({
+      where,
+    });
+    return new PaginationVO(list, count, page);
   }
 
-  getProjects(params: {
-    orderBy?: Prisma.ProjectOrderByWithRelationInput;
-  }): Promise<Project[]> {
-    const { orderBy } = params;
-    return this.prisma.project.findMany({
-      orderBy,
+  async createProject(authUser: AuthUser, body: CreateProjectDTO) {
+    const { name, description, framework } = body;
+    const user = await this.shareService.getAuthUser(authUser);
+    const accountId = user.account.id;
+    const project = await this.prisma.project.findUnique({
+      where: {
+        name_accountId: {
+          name,
+          accountId,
+        },
+      },
     });
-  }
-
-  async createProject(data: Prisma.ProjectCreateInput): Promise<Project> {
+    if (project) {
+      throw new HttpException('项目已存在', HttpStatus.BAD_REQUEST);
+    }
+    if (!/^[A-Za-z0-9\/-]+$/.test(name)) {
+      throw new HttpException('项目名称只能由英文组成', HttpStatus.BAD_REQUEST);
+    }
+    const id = `${name}-${nanoid(8)}`;
     return this.prisma.project.create({
-      data,
+      data: {
+        id,
+        name,
+        framework,
+        description,
+        accountId: user.account.id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     });
   }
 
-  async updateProject(params: {
-    where: Prisma.ProjectWhereUniqueInput;
-    data: Prisma.ProjectUpdateInput;
-  }): Promise<Project> {
-    const { where, data } = params;
+  async updateProject(authUser: AuthUser, body: UpdateProjectDTO) {
+    const { id, description, framework } = body;
+    const user = await this.shareService.getAuthUser(authUser);
+    const accountId = user.account.id;
     return this.prisma.project.update({
-      data,
-      where,
+      data: {
+        description,
+        framework,
+        updatedAt: new Date(),
+      },
+      where: {
+        id,
+        accountId,
+      },
     });
   }
 
-  async deleteProject(where: Prisma.ProjectWhereUniqueInput): Promise<Project> {
+  async deleteProject(authUser: AuthUser, id: string) {
+    const user = await this.shareService.getAuthUser(authUser);
+    const accountId = user.account.id;
     return this.prisma.project.delete({
-      where,
+      where: {
+        id,
+        accountId,
+      },
     });
   }
 }

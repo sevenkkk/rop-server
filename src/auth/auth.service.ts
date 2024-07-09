@@ -7,11 +7,11 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '@/src/user/user.service';
 import {
-  AuthResult,
+  AuthVO,
   AuthUser,
-  LoginBody,
-  LoginResult,
-  RegisterBody,
+  LoginDTO,
+  LoginVO,
+  RegisterDTO,
 } from '@/src/auth/auth.model';
 import { User } from '@prisma/client';
 import { jwtConstants } from '@/src/auth/constants';
@@ -24,7 +24,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn({ username, password }: LoginBody): Promise<LoginResult> {
+  async signIn({ username, password }: LoginDTO): Promise<LoginVO> {
     const user = await this.userService.getUser({ username });
     if (user?.password !== password) {
       throw new UnauthorizedException();
@@ -35,7 +35,7 @@ export class AuthService {
     };
   }
 
-  async register(body: RegisterBody): Promise<LoginResult> {
+  async register(body: RegisterDTO): Promise<LoginVO> {
     const { username, password } = body;
     const user = await this.userService.getUser({ username });
     if (user) {
@@ -45,7 +45,7 @@ export class AuthService {
     const newUser = await this.userService.createUser({
       username,
       password,
-      Account: {
+      account: {
         connectOrCreate: {
           where: { id: accountId },
           create: { id: accountId },
@@ -58,7 +58,7 @@ export class AuthService {
     };
   }
 
-  async refreshToken(token: string): Promise<AuthResult> {
+  async refreshToken(token: string): Promise<AuthVO> {
     // 验证refresh_token
     const payload = await this.jwtService.verifyAsync(token, {
       secret: jwtConstants.secret,
@@ -67,7 +67,7 @@ export class AuthService {
     return this.createAuth(user);
   }
 
-  async createAuth(user: User): Promise<AuthResult> {
+  async createAuth(user: User): Promise<AuthVO> {
     const payload: AuthUser = {
       sub: user.id,
       username: user.username,

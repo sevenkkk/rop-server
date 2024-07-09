@@ -1,11 +1,21 @@
-import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { AccessKeyService } from '@/src/access-key/access-key.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import {
-  AccessKeyListBody,
-  CreateAccessKeyBody,
-  EnableAccessKeyBody,
+  AccessKeyListDTO,
+  CreateAccessKeyDTO,
+  EnableAccessKeyDTO,
 } from '@/src/access-key/access-key.model';
+import { Auth } from '@/src/auth/auth.decorator';
+import { AuthUser } from '@/src/auth/auth.model';
 
 @ApiBearerAuth()
 @Controller('access-key')
@@ -13,22 +23,25 @@ export class AccessKeyController {
   constructor(private accessKeyService: AccessKeyService) {}
 
   @Post('list')
-  getAccessKeys(@Body() body: AccessKeyListBody) {
-    return this.accessKeyService.getAccessKeyList(body);
+  getAccessKeys(@Auth() user: AuthUser, @Body() body: AccessKeyListDTO) {
+    return this.accessKeyService.getAccessKeyList(user, body);
   }
 
   @Post()
-  creatAccessKey(@Body() body: CreateAccessKeyBody) {
-    return this.accessKeyService.createAccessKey(body);
+  creatAccessKey(@Auth() user: AuthUser, @Body() body: CreateAccessKeyDTO) {
+    return this.accessKeyService.createAccessKey(user, body);
   }
 
-  @Delete(':id')
-  deleteAccessKey(@Param() params: { id: string }) {
-    return this.accessKeyService.deleteAccessKey(parseInt(params.id));
+  @Delete(':accessKey')
+  deleteAccessKey(
+    @Auth() user: AuthUser,
+    @Param('accessKey') accessKey: string,
+  ) {
+    return this.accessKeyService.deleteAccessKey(user, accessKey);
   }
 
   @Put('enabled')
-  enableAccessKey(@Body() body: EnableAccessKeyBody) {
-    return this.accessKeyService.enableAccessKey(body);
+  enableAccessKey(@Auth() user: AuthUser, @Body() body: EnableAccessKeyDTO) {
+    return this.accessKeyService.enableAccessKey(user, body);
   }
 }

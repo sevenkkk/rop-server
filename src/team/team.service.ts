@@ -1,26 +1,23 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/src/prisma/prisma.service';
-import { CreateTeamBody } from '@/src/team/team.model';
+import { CreateTeamDTO } from '@/src/team/team.model';
 import { nanoid } from 'nanoid';
+import { AuthUser } from '@/src/auth/auth.model';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class TeamService {
   constructor(private prisma: PrismaService) {}
 
-  async create(body: CreateTeamBody) {
-    const { teamKey, teamDesc } = body;
-    const team = await this.prisma.team.findUnique({
-      where: { key: teamKey },
-    });
-    if (team) {
-      throw new HttpException('用户名已存在', HttpStatus.BAD_REQUEST);
-    }
-    const accountId = `${teamKey}-${nanoid(8)}`;
-    const newTeam = await this.prisma.team.create({
+  async create(user: AuthUser, body: CreateTeamDTO) {
+    const { key, name, description } = body;
+    const accountId = `${key}-${nanoid(8)}`;
+    const team = await this.prisma.team.create({
       data: {
-        key: teamKey,
-        description: teamDesc,
-        Account: {
+        key: key,
+        name,
+        description,
+        account: {
           connectOrCreate: {
             where: { id: accountId },
             create: { id: accountId },
@@ -28,8 +25,15 @@ export class TeamService {
         },
       },
     });
+    await this.prisma.userTeam.create({
+      data: {
+        userId: user.sub,
+        teamId: team.id,
+        role: Role.ADMIN,
+      },
+    });
     return {
-      team: newTeam,
+      team: team,
     };
   }
 }
