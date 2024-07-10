@@ -13,7 +13,7 @@ export const ApiListResponse = <TModel extends Type<any>>(model: TModel) => {
             properties: {
               total: { type: 'number', default: '0' },
               current: { type: 'number', default: '1' },
-              data: {
+              list: {
                 type: 'array',
                 items: { $ref: getSchemaPath(model) },
               },

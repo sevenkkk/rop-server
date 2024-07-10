@@ -6,7 +6,7 @@ import {
   CreateAccessKeyDto,
   EnableAccessKeyDto,
   UpdateAccessKeyDto,
-} from '@/src/access-key/accessKey.entity';
+} from '@/src/access-key/access-key.entity';
 import { nanoid } from 'nanoid';
 import { getSkip, PaginationResultDto } from '@/src/share/share.entity';
 import { AuthUserDto } from '@/src/auth/auth.entity';

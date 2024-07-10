@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { AccessKeyService } from './accessKey.service';
-import { AccessKeyController } from './accessKey.controller';
+import { AccessKeyService } from './access-key.service';
+import { AccessKeyController } from './access-key.controller';
 import { ShareModule } from '@/src/share/share.module';
 
 @Module({

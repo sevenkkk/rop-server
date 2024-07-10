@@ -1,13 +1,13 @@
 import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common';
-import { AccessKeyService } from '@/src/access-key/accessKey.service';
-import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
+import { AccessKeyService } from '@/src/access-key/access-key.service';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import {
   AccessKeyDto,
   AccessKeyListDto,
   CreateAccessKeyDto,
   EnableAccessKeyDto,
   UpdateAccessKeyDto,
-} from '@/src/access-key/accessKey.entity';
+} from '@/src/access-key/access-key.entity';
 import { Auth } from '@/src/auth/auth.decorator';
 import { AuthUserDto } from '@/src/auth/auth.entity';
 import { ApiListResponse } from '@/src/share/api-list-response.decorator';

@@ -25,9 +25,15 @@ export class UpdateProjectDTO {
 export class ProjectDto implements Project {
   id: string;
   name: string;
-  framework: $Enums.Framework;
+  framework: Framework;
   description: string;
   accountId: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export enum Framework {
+  TAURI = 'TAURI',
+  IONIC = 'IONIC',
+  FLUTTER = 'FLUTTER',
 }
