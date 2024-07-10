@@ -1,9 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { TeamService } from '@/src/team/team.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { CreateTeamDTO } from '@/src/team/team.model';
+import { CreateTeamDto } from '@/src/team/team.entity';
 import { Auth } from '@/src/auth/auth.decorator';
-import { AuthUser } from '@/src/auth/auth.model';
+import { AuthUserDto } from '@/src/auth/auth.entity';
 
 @ApiBearerAuth()
 @Controller('team')
@@ -11,7 +11,7 @@ export class TeamController {
   constructor(private readonly teamService: TeamService) {}
 
   @Post()
-  createTeam(@Auth() user: AuthUser, @Body() body: CreateTeamDTO) {
+  createTeam(@Auth() user: AuthUserDto, @Body() body: CreateTeamDto) {
     return this.teamService.create(user, body);
   }
 }

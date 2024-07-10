@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/src/prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
-import { getSkip, PaginationVO } from '@/src/share/model';
-import { UserListDTO } from '@/src/user/user.model';
+import { getSkip, PaginationResultDto } from '@/src/share/share.entity';
+import { UserListDto } from '@/src/user/user.entity';
 
 @Injectable()
 export class UserService {
@@ -20,7 +20,7 @@ export class UserService {
     });
   }
 
-  async getUserList(body: UserListDTO) {
+  async getUserList(body: UserListDto) {
     const { username } = body;
     const { page, pageSize: take, skip } = getSkip(body);
     const where: Prisma.UserWhereInput = username
@@ -34,11 +34,16 @@ export class UserService {
       skip,
       take,
       where,
+      select: {
+        id: true,
+        username: true,
+        account: true,
+      },
     });
     const count = await this.prisma.user.count({
       where,
     });
-    return new PaginationVO(userList, count, page);
+    return new PaginationResultDto(userList, count, page);
   }
 
   async createUser(data: Prisma.UserCreateInput): Promise<User> {

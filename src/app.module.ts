@@ -9,7 +9,7 @@ import { UploadModule } from './upload/upload.module';
 import { DownloadModule } from './download/download.module';
 import { ProjectModule } from './project/project.module';
 import { VersionModule } from './version/version.module';
-import { AccessKeyModule } from './access-key/access-key.module';
+import { AccessKeyModule } from './access-key/accessKey.module';
 import { TeamModule } from './team/team.module';
 
 @Module({

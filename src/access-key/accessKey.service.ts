@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/src/prisma/prisma.service';
 import { AccessKey } from '@prisma/client';
 import {
-  AccessKeyListDTO,
-  CreateAccessKeyDTO,
-  EnableAccessKeyDTO,
-  UpdateAccessKeyDTO,
-} from '@/src/access-key/access-key.model';
+  AccessKeyListDto,
+  CreateAccessKeyDto,
+  EnableAccessKeyDto,
+  UpdateAccessKeyDto,
+} from '@/src/access-key/accessKey.entity';
 import { nanoid } from 'nanoid';
-import { getSkip, PaginationVO } from '@/src/share/model';
-import { AuthUser } from '@/src/auth/auth.model';
+import { getSkip, PaginationResultDto } from '@/src/share/share.entity';
+import { AuthUserDto } from '@/src/auth/auth.entity';
 import { ShareService } from '@/src/share/share.service';
 
 @Injectable()
@@ -19,7 +19,7 @@ export class AccessKeyService {
     private shareService: ShareService,
   ) {}
 
-  async getAccessKeyList(authUser: AuthUser, body: AccessKeyListDTO) {
+  async getAccessKeyList(authUser: AuthUserDto, body: AccessKeyListDto) {
     const user = await this.shareService.getAuthUser(authUser);
     const accountId = user.account.id;
     const { accessKey } = body;
@@ -33,12 +33,12 @@ export class AccessKeyService {
     const count = await this.prisma.accessKey.count({
       where,
     });
-    return new PaginationVO(list, count, page);
+    return new PaginationResultDto(list, count, page);
   }
 
   async createAccessKey(
-    authUser: AuthUser,
-    body: CreateAccessKeyDTO,
+    authUser: AuthUserDto,
+    body: CreateAccessKeyDto,
   ): Promise<AccessKey> {
     const user = await this.shareService.getAuthUser(authUser);
     const accountId = user.account.id;
@@ -56,7 +56,7 @@ export class AccessKeyService {
   }
 
   async deleteAccessKey(
-    authUser: AuthUser,
+    authUser: AuthUserDto,
     accessKey: string,
   ): Promise<AccessKey> {
     const user = await this.shareService.getAuthUser(authUser);
@@ -71,7 +71,7 @@ export class AccessKeyService {
     });
   }
 
-  async enableAccessKey(authUser: AuthUser, body: EnableAccessKeyDTO) {
+  async enableAccessKey(authUser: AuthUserDto, body: EnableAccessKeyDto) {
     const user = await this.shareService.getAuthUser(authUser);
     const accountId = user.account.id;
     const { id, status } = body;
@@ -86,7 +86,7 @@ export class AccessKeyService {
     });
   }
 
-  async updateAccessKey(authUser: AuthUser, body: UpdateAccessKeyDTO) {
+  async updateAccessKey(authUser: AuthUserDto, body: UpdateAccessKeyDto) {
     const user = await this.shareService.getAuthUser(authUser);
     const accountId = user.account.id;
     const { id, expiration, description } = body;

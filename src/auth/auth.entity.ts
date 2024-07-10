@@ -1,7 +1,7 @@
-import { User } from '@prisma/client';
 import { IsNotEmpty } from 'class-validator';
+import { UserDto } from '@/src/user/user.entity';
 
-export class LoginDTO {
+export class LoginDto {
   @IsNotEmpty({
     message: '请输入用户名',
   })
@@ -12,7 +12,7 @@ export class LoginDTO {
   password: string;
 }
 
-export class RegisterDTO {
+export class RegisterDto {
   @IsNotEmpty({
     message: '请输入用户名',
   })
@@ -23,17 +23,17 @@ export class RegisterDTO {
   password: string;
 }
 
-export type LoginVO = {
-  auth: AuthVO;
-  user: User;
-};
+export class LoginResultDto {
+  auth: AuthDto;
+  user: UserDto;
+}
 
-export type AuthVO = {
+export class AuthDto {
   accessToken: string;
   refreshToken: string;
-};
+}
 
-export type AuthUser = {
+export class AuthUserDto {
   sub: number;
   username: string;
-};
+}

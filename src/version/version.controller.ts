@@ -1,5 +1,5 @@
 import { Body, Controller, Param, Post, Put } from '@nestjs/common';
-import { PaginationDTO } from '@/src/share/model';
+import { PaginationDto } from '@/src/share/share.entity';
 import { VersionSearchRequest } from '@/src/version/version.model';
 import { VersionService } from '@/src/version/version.service';
 import { ApiBearerAuth } from '@nestjs/swagger';

@@ -6,9 +6,9 @@ import {
   CreateProjectDTO,
   ProjectListDTO,
   UpdateProjectDTO,
-} from '@/src/project/project.model';
-import { getSkip, PaginationVO } from '@/src/share/model';
-import { AuthUser } from '@/src/auth/auth.model';
+} from '@/src/project/project.entity';
+import { getSkip, PaginationResultDto } from '@/src/share/share.entity';
+import { AuthUserDto } from '@/src/auth/auth.entity';
 import { ShareService } from '@/src/share/share.service';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class ProjectService {
     private shareService: ShareService,
   ) {}
 
-  async getProjectList(authUser: AuthUser, body: ProjectListDTO) {
+  async getProjectList(authUser: AuthUserDto, body: ProjectListDTO) {
     const user = await this.shareService.getAuthUser(authUser);
     const accountId = user.account.id;
     const { name } = body;
@@ -42,10 +42,10 @@ export class ProjectService {
     const count = await this.prisma.project.count({
       where,
     });
-    return new PaginationVO(list, count, page);
+    return new PaginationResultDto(list, count, page);
   }
 
-  async createProject(authUser: AuthUser, body: CreateProjectDTO) {
+  async createProject(authUser: AuthUserDto, body: CreateProjectDTO) {
     const { name, description, framework } = body;
     const user = await this.shareService.getAuthUser(authUser);
     const accountId = user.account.id;
@@ -77,7 +77,7 @@ export class ProjectService {
     });
   }
 
-  async updateProject(authUser: AuthUser, body: UpdateProjectDTO) {
+  async updateProject(authUser: AuthUserDto, body: UpdateProjectDTO) {
     const { id, description, framework } = body;
     const user = await this.shareService.getAuthUser(authUser);
     const accountId = user.account.id;
@@ -94,7 +94,7 @@ export class ProjectService {
     });
   }
 
-  async deleteProject(authUser: AuthUser, id: string) {
+  async deleteProject(authUser: AuthUserDto, id: string) {
     const user = await this.shareService.getAuthUser(authUser);
     const accountId = user.account.id;
     return this.prisma.project.delete({

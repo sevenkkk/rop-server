@@ -1,17 +1,27 @@
 import { IsBoolean, IsNotEmpty, IsNumber } from 'class-validator';
-import { PaginationDTO } from '@/src/share/model';
+import { PaginationDto } from '@/src/share/share.entity';
+import { AccessKey } from '@prisma/client';
 
-export class CreateAccessKeyDTO {
-  description: string;
+export class CreateAccessKeyDto {
+  description?: string;
   @IsNotEmpty({ message: '请输入过期时间' })
   expiration: string;
 }
 
-export class AccessKeyListDTO extends PaginationDTO {
-  accessKey: string;
+export class AccessKeyListDto extends PaginationDto {
+  accessKey?: string;
 }
 
-export class EnableAccessKeyDTO {
+export class AccessKeyDto implements AccessKey {
+  id: number;
+  accessKey: string;
+  description: string;
+  expiration: Date;
+  enabled: boolean;
+  accountId: string;
+}
+
+export class EnableAccessKeyDto {
   @IsNumber(
     { allowNaN: false, allowInfinity: false, maxDecimalPlaces: 0 },
     { message: '请输入正确的id' },
@@ -21,12 +31,12 @@ export class EnableAccessKeyDTO {
   status: boolean;
 }
 
-export class UpdateAccessKeyDTO {
+export class UpdateAccessKeyDto {
   @IsNumber(
     { allowNaN: false, allowInfinity: false, maxDecimalPlaces: 0 },
     { message: '请输入正确的id' },
   )
   id: number;
-  description: string;
-  expiration: string;
+  description?: string;
+  expiration?: string;
 }
