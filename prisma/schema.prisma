@@ -89,7 +89,7 @@ model Branch {
   project          Project   @relation(fields: [projectId], references: [id])
   versions         Version[]
   releaseVersionId Int?      @unique
-  realseVersion    Version?  @relation("release", fields: [releaseVersionId], references: [id])
+  releaseVersion   Version?  @relation("release", fields: [releaseVersionId], references: [id])
 
   @@unique([branch, projectId])
 }

@@ -13,6 +13,7 @@ import { AccessKeyModule } from './access-key/access-key.module';
 import { TeamModule } from './team/team.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { BranchModule } from './branch/branch.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { join } from 'path';
     VersionModule,
     AccessKeyModule,
     TeamModule,
+    BranchModule,
   ],
   controllers: [AppController],
   providers: [AppService],
