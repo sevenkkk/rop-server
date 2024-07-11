@@ -1,16 +1,13 @@
 import {
   Body,
   Controller,
-  Get,
-  Param,
   Post,
-  Res,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Public } from '../auth/constants';
-import { UploadModel } from '@/src/upload/upload.model';
+import { uploadFile, UploadModel } from '@/src/upload/upload.model';
 import { UploadService } from '@/src/upload/upload.service';
 
 @Controller('upload')
@@ -26,13 +23,10 @@ export class UploadController {
   )
   uploadFile(
     @UploadedFiles()
-    files: {
-      releaseFile: Express.Multer.File[];
-      updateFile: Express.Multer.File[];
-    },
+    files: uploadFile,
     @Body() body: UploadModel,
   ) {
-    this.uploadService.uploadFile(files[0], body);
-    return 'ok';
+    return this.uploadService.uploadFile(files, body);
+    // return 'ok';
   }
 }

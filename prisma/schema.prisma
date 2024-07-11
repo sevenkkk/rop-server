@@ -69,7 +69,7 @@ model AccessKey {
 // 项目
 model Project {
   id          String    @id
-  name        String    // 英文
+  name        String // 英文
   framework   Framework
   description String?
   accountId   String
