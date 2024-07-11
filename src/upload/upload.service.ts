@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { join } from 'path';
-import { uploadFile, UploadModel } from '@/src/upload/upload.model';
+import { uploadFileDto, UploadDto } from '@/src/upload/upload.entity';
 import { mkdirsSync, writeFileSync } from 'fs-extra';
 import { PrismaService } from '@/src/prisma/prisma.service';
 import { ShareService } from '@/src/share/share.service';
@@ -13,7 +13,7 @@ export class UploadService {
   ) {}
 
   // 单个文件上传
-  async uploadFile(file: uploadFile, body: UploadModel) {
+  async uploadFile(file: uploadFileDto, body: UploadDto) {
     const { accessKey, projectName, branch, version, platform } = body;
     const { releaseFile, updateFile } = file;
     const accessKeyObj = await this.prisma.accessKey.findUnique({

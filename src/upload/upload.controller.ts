@@ -7,12 +7,21 @@ import {
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Public } from '../auth/constants';
-import { uploadFile, UploadModel } from '@/src/upload/upload.model';
+import {
+  UploadDto,
+  uploadFileDto,
+  VersionDto,
+} from '@/src/upload/upload.entity';
 import { UploadService } from '@/src/upload/upload.service';
+import { ApiOkResponse } from '@nestjs/swagger';
 
 @Controller('upload')
 export class UploadController {
   constructor(private uploadService: UploadService) {}
+
+  @ApiOkResponse({
+    type: VersionDto,
+  })
   @Public()
   @Post()
   @UseInterceptors(
@@ -23,10 +32,9 @@ export class UploadController {
   )
   uploadFile(
     @UploadedFiles()
-    files: uploadFile,
-    @Body() body: UploadModel,
+    files: uploadFileDto,
+    @Body() body: UploadDto,
   ) {
     return this.uploadService.uploadFile(files, body);
-    // return 'ok';
   }
 }

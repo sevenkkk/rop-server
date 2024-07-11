@@ -1,6 +1,7 @@
 import { IsIn, IsNotEmpty } from 'class-validator';
+import { $Enums, Version } from '@prisma/client';
 
-export class UploadModel {
+export class UploadDto {
   @IsNotEmpty({ message: '请输入密钥' })
   accessKey: string;
   @IsNotEmpty({ message: '请输入项目名称' })
@@ -15,7 +16,7 @@ export class UploadModel {
   platform: 'Android' | 'IOS' | 'Windows' | 'MacOS' | 'H5';
 }
 
-export type uploadFile = {
+export type uploadFileDto = {
   releaseFile: Express.Multer.File;
   updateFile: Express.Multer.File;
 };
@@ -26,4 +27,17 @@ export enum Platform {
   Windows = 'Windows',
   MacOS = 'MacOS',
   H5 = 'H5',
+}
+
+export class VersionDto implements Version {
+  id: number;
+  version: string;
+  path: string;
+  sigPath: string;
+  platform: $Enums.Platform;
+  projectId: string;
+  release: boolean;
+  branchId: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
