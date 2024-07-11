@@ -11,11 +11,17 @@ import { ProjectModule } from './project/project.module';
 import { VersionModule } from './version/version.module';
 import { AccessKeyModule } from './access-key/access-key.module';
 import { TeamModule } from './team/team.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    ServeStaticModule.forRoot({
+      serveRoot: '/public',
+      rootPath: join(__dirname, '../', 'public'),
     }),
     AuthModule,
     UserModule,
