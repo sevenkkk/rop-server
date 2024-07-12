@@ -14,7 +14,15 @@ export class UploadService {
 
   // 单个文件上传
   async uploadFile(file: uploadFileDto, body: UploadDto) {
-    const { accessKey, projectName, branch, version, platform, arch } = body;
+    const {
+      accessKey,
+      projectName,
+      branch,
+      version,
+      platform,
+      arch,
+      signature,
+    } = body;
     const { releaseFile, sigFile } = file;
     const accessKeyObj = await this.prisma.accessKey.findUnique({
       where: { accessKey },
@@ -62,6 +70,7 @@ export class UploadService {
         sigPath,
         platform,
         arch,
+        signature,
         projectId: project.id,
         release: false,
         branchId: branchObj.id,

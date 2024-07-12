@@ -19,10 +19,6 @@ export class UploadController {
   @ApiOkResponse({
     type: VersionDto,
   })
-  @ApiParam({
-    name: 'UploadDto',
-    type: UploadDto,
-  })
   @Public()
   @Post()
   @UseInterceptors(

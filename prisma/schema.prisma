@@ -109,7 +109,8 @@ model Version {
   id             Int             @id @default(autoincrement())
   version        String // 版本 格式为 1.1.1
   path           String // 文件存储路径
-  sigPath        String? // 签名
+  sigPath        String? // 签名文件存储路径
+  signature      String? // 签名
   platform       Platform // 平台
   arch           String? // 计算机的体系结构
   notes          String? // 发布描述

@@ -49,6 +49,7 @@ export class VersionDto implements Version {
   version: string;
   path: string;
   sigPath: string;
+  signature: string;
   platform: $Enums.Platform;
   arch: string;
   notes: string;

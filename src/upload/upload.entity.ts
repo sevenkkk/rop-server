@@ -14,6 +14,7 @@ export class UploadDto {
   })
   platform: 'Android' | 'IOS' | 'Windows' | 'MacOS' | 'H5';
   arch: string;
+  signature: string;
 }
 
 export type uploadFileDto = {
