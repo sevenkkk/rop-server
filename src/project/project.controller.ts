@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common';
 import { ProjectService } from '@/src/project/project.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExtraModels } from '@nestjs/swagger';
 import {
   CreateProjectDTO,
   ProjectDto,
@@ -13,6 +13,7 @@ import { ApiListResponse } from '@/src/share/api-list-response.decorator';
 
 @ApiBearerAuth()
 @Controller('project')
+@ApiExtraModels(ProjectDto)
 export class ProjectController {
   constructor(private projectService: ProjectService) {}
 

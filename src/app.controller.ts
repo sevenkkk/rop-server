@@ -1,9 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { Public } from '@/src/auth/constants';
 import { ApiExtraModels } from '@nestjs/swagger';
-import { UserDto } from '@/src/user/user.entity';
-import { ProjectDto } from '@/src/project/project.entity';
-import { AccessKeyDto } from '@/src/access-key/access-key.entity';
 
 export class PaginationResultDto {
   list: object[];
@@ -11,7 +8,7 @@ export class PaginationResultDto {
   current: number;
 }
 
-@ApiExtraModels(PaginationResultDto, UserDto, ProjectDto, AccessKeyDto)
+@ApiExtraModels(PaginationResultDto)
 @Controller()
 export class AppController {
   constructor() {}

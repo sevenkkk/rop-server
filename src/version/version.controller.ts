@@ -1,42 +1,43 @@
-import { Body, Controller, Param, Post, Put } from '@nestjs/common';
-import { PaginationDto } from '@/src/share/share.entity';
-import { VersionSearchRequest } from '@/src/version/version.model';
+import { Body, Controller, Post } from '@nestjs/common';
 import { VersionService } from '@/src/version/version.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
+import { Auth } from '@/src/auth/auth.decorator';
+import { AuthUserDto } from '@/src/auth/auth.entity';
+import {
+  NotReleaseVersionListDto,
+  ReleaseVersionReqDto,
+  VersionDto,
+  VersionListDto,
+} from '@/src/version/version.entity';
+import { ApiListResponse } from '@/src/share/api-list-response.decorator';
 
 @ApiBearerAuth()
 @Controller('version')
 export class VersionController {
   constructor(private versionService: VersionService) {}
-  // @Post('list')
-  // versionList(@Body() body: Pagination<VersionSearchRequest>) {
-  //   const { limit: skip, pageSize: take, projectId, envId } = body;
-  //   return this.versionService.getVersions({
-  //     skip,
-  //     take,
-  //     where: { projectId, envId },
-  //   });
-  // }
-  //
-  // @Post(':id')
-  // deleteVersion(@Param() id: number) {
-  //   return this.versionService.deleteVersion({ id });
-  // }
-  //
-  // @Put(':id')
-  // releaseVersion(@Body() body: { id: number; envId: string }) {
-  //   const { id, envId } = body;
-  //   this.envService.updateEnv({
-  //     where: { id: envId },
-  //     data: {
-  //       lastVersion: {
-  //         connect: { id },
-  //       },
-  //     },
-  //   });
-  //   this.versionService.updateVersion({
-  //     where: { id },
-  //     data: { release: true },
-  //   });
-  // }
+
+  @ApiListResponse(VersionDto)
+  @Post('list')
+  versionList(@Auth() user: AuthUserDto, @Body() body: VersionListDto) {
+    return this.versionService.getVersionList(user, body);
+  }
+
+  @ApiOkResponse({
+    type: [VersionDto],
+  })
+  @Post('not_release/list')
+  notReleaseVersionList(
+    @Auth() user: AuthUserDto,
+    @Body() body: NotReleaseVersionListDto,
+  ) {
+    return this.versionService.getNotReleaseVersionList(user, body);
+  }
+
+  @Post('release')
+  releaseVersion(
+    @Auth() user: AuthUserDto,
+    @Body() body: ReleaseVersionReqDto,
+  ) {
+    return this.versionService.releaseVersion(user, body);
+  }
 }

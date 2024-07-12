@@ -14,8 +14,8 @@ export class UploadService {
 
   // 单个文件上传
   async uploadFile(file: uploadFileDto, body: UploadDto) {
-    const { accessKey, projectName, branch, version, platform } = body;
-    const { releaseFile, updateFile } = file;
+    const { accessKey, projectName, branch, version, platform, arch } = body;
+    const { releaseFile, sigFile } = file;
     const accessKeyObj = await this.prisma.accessKey.findUnique({
       where: { accessKey },
     });
@@ -51,9 +51,9 @@ export class UploadService {
       },
     });
 
-    const dir = `public/${project.id}/${branch}/${platform}/${version}`;
+    const dir = `public/${project.id}/${branch}/${version}`;
     const path = `${dir}/${releaseFile[0].originalname}`;
-    const sigPath = `${dir}/${updateFile[0].originalname}`;
+    const sigPath = `${dir}/${sigFile[0].originalname}`;
 
     const versionObj = await this.prisma.version.create({
       data: {
@@ -61,6 +61,7 @@ export class UploadService {
         path,
         sigPath,
         platform,
+        arch,
         projectId: project.id,
         release: false,
         branchId: branchObj.id,
@@ -69,7 +70,7 @@ export class UploadService {
 
     mkdirsSync(join(__dirname, '../../', dir));
     writeFileSync(join(__dirname, '../../', path), releaseFile[0].buffer); // 写入文件内容
-    writeFileSync(join(__dirname, '../../', sigPath), updateFile[0].buffer); // 写入文件内容
+    writeFileSync(join(__dirname, '../../', sigPath), sigFile[0].buffer); // 写入文件内容
     return versionObj;
   }
 }

@@ -83,34 +83,46 @@ model Project {
 }
 
 model Branch {
-  id               Int       @id @default(autoincrement())
-  branch           String
-  projectId        String
-  project          Project   @relation(fields: [projectId], references: [id])
-  versions         Version[]
-  releaseVersionId Int?      @unique
-  releaseVersion   Version?  @relation("release", fields: [releaseVersionId], references: [id])
+  id              Int              @id @default(autoincrement())
+  branch          String
+  projectId       String
+  project         Project          @relation(fields: [projectId], references: [id])
+  versions        Version[]
+  releaseVersions ReleaseVersion[]
 
   @@unique([branch, projectId])
 }
 
+model ReleaseVersion {
+  projectId String
+  branchId  Int
+  platform  Platform
+  versionId Int      @unique
+  version   Version  @relation(fields: [versionId], references: [id])
+  Branch    Branch   @relation(fields: [branchId], references: [id])
+
+  @@id([projectId, branchId, platform])
+}
+
 // 版本管理
 model Version {
-  id            Int      @id @default(autoincrement())
-  version       String // 版本 格式为 1.1.1
-  path          String // 文件存储路径
-  sigPath       String? // 签名
-  platform      Platform // 平台
-  projectId     String // 项目Id
-  Project       Project  @relation(fields: [projectId], references: [id])
-  release       Boolean  @default(false) // 是否已经发布
-  branchId      Int
-  branch        Branch   @relation(fields: [branchId], references: [id])
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  releaseBranch Branch?  @relation("release")
+  id             Int             @id @default(autoincrement())
+  version        String // 版本 格式为 1.1.1
+  path           String // 文件存储路径
+  sigPath        String? // 签名
+  platform       Platform // 平台
+  arch           String? // 计算机的体系结构
+  notes          String? // 发布描述
+  projectId      String // 项目Id
+  Project        Project         @relation(fields: [projectId], references: [id])
+  release        Boolean         @default(false) // 是否已经发布
+  branchId       Int
+  branch         Branch          @relation(fields: [branchId], references: [id])
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  ReleaseVersion ReleaseVersion?
 
-  @@unique([projectId, branchId, version, platform])
+  @@unique([projectId, branchId, version, platform, arch])
 }
 
 // accountId => seven-000000000
@@ -124,6 +136,7 @@ model Version {
 //
 
 // params: accessKey, projectKey, branch, version, file
+// 生成json
 
 // 权限
 enum Role {

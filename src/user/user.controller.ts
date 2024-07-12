@@ -2,12 +2,13 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { UserService } from '@/src/user/user.service';
 import { AuthUserDto } from '@/src/auth/auth.entity';
 import { Auth } from '@/src/auth/auth.decorator';
-import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExtraModels, ApiOkResponse } from '@nestjs/swagger';
 import { UserDto, UserListDto } from '@/src/user/user.entity';
 import { ApiListResponse } from '@/src/share/api-list-response.decorator';
 
 @ApiBearerAuth()
 @Controller('user')
+@ApiExtraModels(UserDto)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 

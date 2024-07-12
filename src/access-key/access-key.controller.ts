@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common';
 import { AccessKeyService } from '@/src/access-key/access-key.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExtraModels } from '@nestjs/swagger';
 import {
   AccessKeyDto,
   AccessKeyListDto,
@@ -14,6 +14,7 @@ import { ApiListResponse } from '@/src/share/api-list-response.decorator';
 
 @ApiBearerAuth()
 @Controller('access-key')
+@ApiExtraModels(AccessKeyDto)
 export class AccessKeyController {
   constructor(private accessKeyService: AccessKeyService) {}
 
