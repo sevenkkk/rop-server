@@ -29,7 +29,7 @@ export class BranchService {
         projectId,
       },
       include: {
-        releaseVersion: true,
+        versions: true,
       },
     });
   }

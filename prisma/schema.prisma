@@ -110,7 +110,7 @@ model Version {
   updatedAt     DateTime @updatedAt
   releaseBranch Branch?  @relation("release")
 
-  @@unique([projectId, branchId, version])
+  @@unique([projectId, branchId, version, platform])
 }
 
 // accountId => seven-000000000

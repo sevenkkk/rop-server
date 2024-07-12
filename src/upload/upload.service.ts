@@ -51,7 +51,7 @@ export class UploadService {
       },
     });
 
-    const dir = `public/${project.id}/${branch}/${version}`;
+    const dir = `public/${project.id}/${branch}/${platform}/${version}`;
     const path = `${dir}/${releaseFile[0].originalname}`;
     const sigPath = `${dir}/${updateFile[0].originalname}`;
 
