@@ -44,13 +44,12 @@ model UserTeam {
 
 // 账户
 model Account {
-  id         String      @id
-  userId     Int?        @unique
-  user       User?       @relation(fields: [userId], references: [id])
-  teamId     Int?        @unique
-  team       Team?       @relation(fields: [teamId], references: [id])
-  accessKeys AccessKey[]
-  projects   Project[]
+  id       String    @id
+  userId   Int?      @unique
+  user     User?     @relation(fields: [userId], references: [id])
+  teamId   Int?      @unique
+  team     Team?     @relation(fields: [teamId], references: [id])
+  projects Project[]
 }
 
 // 访问秘钥
@@ -60,24 +59,25 @@ model AccessKey {
   description String?
   expiration  DateTime?
   enabled     Boolean   @default(true)
-  accountId   String
-  account     Account   @relation(fields: [accountId], references: [id])
+  projectId   String
+  project     Project   @relation(fields: [projectId], references: [id])
 
-  @@unique([accountId, accessKey])
+  @@unique([projectId, accessKey])
 }
 
 // 项目
 model Project {
-  id          String    @id
+  id          String      @id
   name        String // 英文
   framework   Framework
   description String?
   accountId   String
-  account     Account   @relation(fields: [accountId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  account     Account     @relation(fields: [accountId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   versions    Version[]
   branch      Branch[]
+  accessKeys  AccessKey[]
 
   @@unique([name, accountId])
 }

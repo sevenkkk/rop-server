@@ -34,4 +34,20 @@ export class ShareService {
       project,
     };
   }
+
+  async checkAccessKeyPermission(authUser: AuthUserDto, accessKeyId: number) {
+    const user = await this.getAuthUser(authUser);
+    const accountId = user.account.id;
+    const accessKeyObj = await this.prisma.accessKey.findUnique({
+      where: {
+        id: accessKeyId,
+      },
+      include: {
+        project: true,
+      },
+    });
+    if (accessKeyObj || accessKeyObj.project.accountId == accountId) {
+      throw new HttpException('accessKey不存在', HttpStatus.BAD_REQUEST);
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '@/src/prisma/prisma.service';
 import { AccessKey } from '@prisma/client';
 import {
@@ -40,33 +40,25 @@ export class AccessKeyService {
     authUser: AuthUserDto,
     body: CreateAccessKeyDto,
   ): Promise<AccessKey> {
-    const user = await this.shareService.getAuthUser(authUser);
-    const accountId = user.account.id;
-    const { description, expiration } = body;
+    const { projectId, description, expiration } = body;
+    await this.shareService.checkProjectPermission(authUser, projectId);
     const accessKey = nanoid(32);
     return this.prisma.accessKey.create({
       data: {
         accessKey,
         description,
         expiration: new Date(expiration),
-        accountId,
+        projectId,
         enabled: true,
       },
     });
   }
 
-  async deleteAccessKey(
-    authUser: AuthUserDto,
-    accessKey: string,
-  ): Promise<AccessKey> {
-    const user = await this.shareService.getAuthUser(authUser);
-    const accountId = user.account.id;
+  async deleteAccessKey(authUser: AuthUserDto, id: number): Promise<AccessKey> {
+    await this.shareService.checkAccessKeyPermission(authUser, id);
     return this.prisma.accessKey.delete({
       where: {
-        accountId_accessKey: {
-          accountId,
-          accessKey,
-        },
+        id,
       },
     });
   }
@@ -75,21 +67,30 @@ export class AccessKeyService {
     const user = await this.shareService.getAuthUser(authUser);
     const accountId = user.account.id;
     const { id, status } = body;
+    const accessKeyObj = await this.prisma.accessKey.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        project: true,
+      },
+    });
+    if (accessKeyObj || accessKeyObj.project.accountId == accountId) {
+      throw new HttpException('accessKey不存在', HttpStatus.BAD_REQUEST);
+    }
     return this.prisma.accessKey.update({
       data: {
         enabled: status,
       },
       where: {
         id,
-        accountId,
       },
     });
   }
 
   async updateAccessKey(authUser: AuthUserDto, body: UpdateAccessKeyDto) {
-    const user = await this.shareService.getAuthUser(authUser);
-    const accountId = user.account.id;
     const { id, expiration, description } = body;
+    await this.shareService.checkAccessKeyPermission(authUser, id);
     return this.prisma.accessKey.update({
       data: {
         expiration: expiration ? new Date(expiration) : undefined,
@@ -97,7 +98,6 @@ export class AccessKeyService {
       },
       where: {
         id,
-        accountId,
       },
     });
   }

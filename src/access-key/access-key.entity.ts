@@ -3,6 +3,8 @@ import { PaginationDto } from '@/src/share/share.entity';
 import { AccessKey } from '@prisma/client';
 
 export class CreateAccessKeyDto {
+  @IsNotEmpty({ message: '请输入项目Id' })
+  projectId: string;
   description?: string;
   @IsNotEmpty({ message: '请输入过期时间' })
   expiration: string;
@@ -18,7 +20,7 @@ export class AccessKeyDto implements AccessKey {
   description: string;
   expiration: Date;
   enabled: boolean;
-  accountId: string;
+  projectId: string;
 }
 
 export class EnableAccessKeyDto {

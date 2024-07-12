@@ -14,15 +14,7 @@ export class UploadService {
 
   // 单个文件上传
   async uploadFile(file: uploadFileDto, body: UploadDto) {
-    const {
-      accessKey,
-      projectName,
-      branch,
-      version,
-      platform,
-      arch,
-      signature,
-    } = body;
+    const { accessKey, branch, version, platform, arch, signature } = body;
     const { releaseFile, sigFile } = file;
     const accessKeyObj = await this.prisma.accessKey.findUnique({
       where: { accessKey },
@@ -32,10 +24,7 @@ export class UploadService {
     }
     const project = await this.prisma.project.findUnique({
       where: {
-        name_accountId: {
-          name: projectName,
-          accountId: accessKeyObj.accountId,
-        },
+        id: accessKeyObj.projectId,
       },
     });
     if (!project) {

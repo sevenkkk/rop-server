@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { AccessKeyService } from '@/src/access-key/access-key.service';
 import { ApiBearerAuth, ApiExtraModels } from '@nestjs/swagger';
 import {
@@ -29,12 +37,12 @@ export class AccessKeyController {
     return this.accessKeyService.createAccessKey(user, body);
   }
 
-  @Delete(':accessKey')
+  @Delete(':id')
   deleteAccessKey(
     @Auth() user: AuthUserDto,
-    @Param('accessKey') accessKey: string,
+    @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.accessKeyService.deleteAccessKey(user, accessKey);
+    return this.accessKeyService.deleteAccessKey(user, id);
   }
 
   @Put('enabled')

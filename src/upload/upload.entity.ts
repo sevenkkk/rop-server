@@ -3,8 +3,6 @@ import { IsIn, IsNotEmpty } from 'class-validator';
 export class UploadDto {
   @IsNotEmpty({ message: '请输入密钥' })
   accessKey: string;
-  @IsNotEmpty({ message: '请输入项目名称' })
-  projectName: string;
   @IsNotEmpty({ message: '请输入分支名称' })
   branch: string;
   @IsNotEmpty({ message: '请输入版本号' })
