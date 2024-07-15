@@ -14,6 +14,7 @@ import { TeamModule } from './team/team.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { BranchModule } from './branch/branch.module';
+import { TauriModule } from './tauri/tauri.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { BranchModule } from './branch/branch.module';
     AccessKeyModule,
     TeamModule,
     BranchModule,
+    TauriModule,
   ],
   controllers: [AppController],
   providers: [AppService],
